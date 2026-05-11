@@ -1,0 +1,27 @@
+# Maven
+target/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+*.factorypath
+
+# WSL / Windows Zone Identifiers
+*:Zone.Identifier
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vim / Emacs
+*.swp
+*.swo
+*~
+\#*\#
