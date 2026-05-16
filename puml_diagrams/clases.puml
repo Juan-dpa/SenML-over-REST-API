@@ -1,0 +1,95 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+
+class ParcelaController {
+  - dao: ParcelaDAO
+  + getParcelas() : ResponseEntity<List<Parcela>>
+  + getParcela(id: int) : ResponseEntity<Parcela>
+  + postParcela(parcela: Parcela) : ResponseEntity<String>
+  + putParcela(id: int, parcela: Parcela) : ResponseEntity<String>
+  + deleteParcela(id: int) : ResponseEntity<String>
+}
+
+class DispositivoController {
+  - dao: DispositivoDAO
+  + getDispositivos() : ResponseEntity<List<Dispositivo>>
+  + getDispositivo(id: int) : ResponseEntity<Dispositivo>
+  + postDispositivo(dispositivo: Dispositivo) : ResponseEntity<String>
+  + putDispositivo(id: int, dispositivo: Dispositivo) : ResponseEntity<String>
+  + deleteDispositivo(id: int) : ResponseEntity<String>
+}
+
+class MedicionController {
+  - dao: MedicionDAO
+  + recibirSenML(parcelaId: int, payload: byte[]) : ResponseEntity<String>
+  + obtenerSenMLPorParcela(parcelaId: int) : ResponseEntity<byte[]>
+  + actualizarSenML(parcelaId: int, mid: int, cuerpo: byte[]) : ResponseEntity<String>
+  + deleteMedicion(parcelaId: int, mid: int) : ResponseEntity<String>
+  + obtenerSenMLPorDispositivo(urn: String) : ResponseEntity<byte[]>
+}
+
+class ParcelaDAO {
+  + getAll() : List<Parcela>
+  + getById(id: int) : Parcela
+  + insert(p: Parcela) : boolean
+  + update(id: int, p: Parcela) : boolean
+  + delete(id: int) : boolean
+}
+
+class DispositivoDAO {
+  + getAll() : List<Dispositivo>
+  + getById(id: int) : Dispositivo
+  + insert(d: Dispositivo) : boolean
+  + update(id: int, d: Dispositivo) : boolean
+  + delete(id: int) : boolean
+}
+
+class MedicionDAO {
+  + insertarMedicion(m: Medicion) : boolean
+  + getMedicionesByParcela(parcelaId: int) : List<Medicion>
+  + getMedicionesByDispositivo(urn: String) : List<Medicion>
+  + getMedicionById(id: int) : Medicion
+  + updateMedicion(id: int, m: Medicion) : boolean
+  + deleteMedicion(id: int) : boolean
+}
+
+class Parcela {
+  - id: int
+  - nombre: String
+  - ubicacion: String
+}
+
+class Dispositivo {
+  - id: int
+  - parcelaId: int
+  - urn: String
+  - tipo: String
+  - descripcion: String
+}
+
+class Medicion {
+  - id: int
+  - parcelaId: int
+  - dispositivoUrn: String
+  - magnitud: String
+  - unidad: String
+  - valorNumerico: Double
+  - valorBooleano: Boolean
+  - valorTexto: String
+  - timestampEpoch: Double
+}
+
+ParcelaController *-- "1" ParcelaDAO
+DispositivoController *-- "1" DispositivoDAO
+MedicionController *-- "1" MedicionDAO
+
+ParcelaDAO o-- "*" Parcela
+DispositivoDAO o-- "*" Dispositivo
+MedicionDAO o-- "*" Medicion
+
+Dispositivo o-- "1" Parcela
+Medicion o-- "1" Parcela
+Medicion o-- "1" Dispositivo
+
+@enduml

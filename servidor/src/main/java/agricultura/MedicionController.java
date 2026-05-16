@@ -19,6 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Controlador REST encargado de gestionar las mediciones de los dispositivos.
+ * Soporta la ingesta y consulta de datos utilizando el estándar SenML (JSON).
+ */
 @RestController
 public class MedicionController {
 
@@ -28,6 +32,12 @@ public class MedicionController {
         dao = new MedicionDAO();
     }
 
+    /**
+     * Endpoint para recibir y almacenar una lista de mediciones en formato SenML enviadas por una mota.
+     * @param parcelaId ID de la parcela a la que pertenecen las mediciones.
+     * @param cuerpo Bytes del payload SenML en formato JSON.
+     * @return 201 Created con el número de métricas insertadas, o 400 Bad Request si el SenML es inválido.
+     */
     @PostMapping(
         value = "/parcelas/{id}/mediciones/senml",
         consumes = "application/senml+json"
@@ -129,6 +139,11 @@ public class MedicionController {
         }
     }
 
+    /**
+     * Recupera todas las mediciones de una parcela y las serializa en formato SenML.
+     * @param parcelaId ID de la parcela a consultar.
+     * @return Array de bytes que conforma el documento JSON SenML, o 500 en caso de error interno.
+     */
     @GetMapping(
         value = "/parcelas/{id}/mediciones/senml",
         produces = "application/senml+json"
@@ -192,6 +207,13 @@ public class MedicionController {
         }
     }
 
+    /**
+     * Actualiza una medición específica enviando el nuevo valor en formato SenML.
+     * @param parcelaId ID de la parcela.
+     * @param mid ID de la medición a actualizar en la base de datos.
+     * @param cuerpo Payload SenML con el nuevo valor.
+     * @return 200 OK si se actualiza, 404 si la medición no se encontró.
+     */
     @PutMapping(
         value = "/parcelas/{parcelaId}/mediciones/{mid}/senml",
         consumes = "application/senml+json"
@@ -267,6 +289,12 @@ public class MedicionController {
         }
     }
 
+    /**
+     * Elimina una medición puntual utilizando su ID.
+     * @param parcelaId ID de la parcela.
+     * @param mid ID de la medición.
+     * @return 200 OK si se borró, o 404 Not Found si no existía.
+     */
     @DeleteMapping("/parcelas/{parcelaId}/mediciones/{mid}")
     public ResponseEntity<String> deleteMedicion(
             @PathVariable(value = "parcelaId") int parcelaId,
@@ -281,6 +309,11 @@ public class MedicionController {
         }
     }
 
+    /**
+     * Recupera todas las mediciones de un dispositivo concreto (mota) en formato SenML.
+     * @param urn URN o identificador único del dispositivo.
+     * @return Archivo JSON SenML con todas sus medidas registradas.
+     */
     @GetMapping(
         value = "/dispositivos/{urn}/mediciones/senml",
         produces = "application/senml+json"

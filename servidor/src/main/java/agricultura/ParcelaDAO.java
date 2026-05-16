@@ -4,6 +4,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) para la gestión de Parcelas en la base de datos PostgreSQL.
+ * Contiene todas las operaciones CRUD (Crear, Leer, Actualizar, Borrar).
+ */
 public class ParcelaDAO {
 
     private static final String URL  = "jdbc:postgresql://localhost:5432/juadelavi";
@@ -13,10 +17,19 @@ public class ParcelaDAO {
     public ParcelaDAO() {
     }
 
+    /**
+     * Establece y devuelve una conexión con la base de datos.
+     * @return Conexión activa a PostgreSQL.
+     * @throws SQLException Si hay un error de conexión.
+     */
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);
     }
 
+    /**
+     * Recupera todas las parcelas almacenadas en la base de datos.
+     * @return Lista de objetos Parcela.
+     */
     public List<Parcela> getAll() {
         String sql = "SELECT * FROM parcelas";
         List<Parcela> resultado = new ArrayList<>();
@@ -45,6 +58,11 @@ public class ParcelaDAO {
         return resultado;
     }
 
+    /**
+     * Busca y devuelve una parcela específica dado su ID.
+     * @param id Identificador de la parcela a buscar.
+     * @return Objeto Parcela encontrado o null si no existe.
+     */
     public Parcela getById(int id) {
         String sql = "SELECT * FROM parcelas WHERE id = ?";
         Parcela parcela = null;
@@ -73,6 +91,11 @@ public class ParcelaDAO {
         return parcela;
     }
 
+    /**
+     * Inserta una nueva parcela en la base de datos.
+     * @param p Objeto Parcela con los datos a insertar.
+     * @return true si la inserción fue exitosa, false en caso de error.
+     */
     public boolean insert(Parcela p) {
         String sql = "INSERT INTO parcelas (nombre, ubicacion) VALUES (?, ?)";
 
@@ -94,6 +117,12 @@ public class ParcelaDAO {
         }
     }
 
+    /**
+     * Actualiza los datos de una parcela existente.
+     * @param id Identificador de la parcela a modificar.
+     * @param p Objeto con los nuevos datos de la parcela.
+     * @return true si se actualizó al menos una fila, false si no se encontró o hubo error.
+     */
     public boolean update(int id, Parcela p) {
         String sql = "UPDATE parcelas SET nombre = ?, ubicacion = ? WHERE id = ?";
 
@@ -116,6 +145,11 @@ public class ParcelaDAO {
         }
     }
 
+    /**
+     * Elimina una parcela de la base de datos dado su ID.
+     * @param id Identificador de la parcela a eliminar.
+     * @return true si se eliminó exitosamente, false en caso contrario.
+     */
     public boolean delete(int id) {
         String sql = "DELETE FROM parcelas WHERE id = ?";
 

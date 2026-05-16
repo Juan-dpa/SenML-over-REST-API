@@ -19,6 +19,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Aplicación cliente de consola para interactuar con la API REST de Agricultura Inteligente.
+ * Proporciona un menú interactivo para realizar peticiones HTTP (GET, POST, PUT, DELETE).
+ */
 @SpringBootApplication
 public class ClienteApplication {
 
@@ -26,9 +30,15 @@ public class ClienteApplication {
         SpringApplication.run(ClienteApplication.class, args);
     }
 
+    /**
+     * Configura y ejecuta el cliente interactivo.
+     * @param builder Constructor del cliente REST proporcionado por Spring.
+     * @return ApplicationRunner que contiene el bucle principal del programa.
+     */
     @Bean
     @Profile("!test")
     public ApplicationRunner run(RestClient.Builder builder) {
+        // Inicializar el cliente apuntando al servidor local
         RestClient restClient = builder.baseUrl("http://localhost:8080").build();
 
         return args -> {
@@ -69,6 +79,7 @@ public class ClienteApplication {
                     switch (opcion) {
 
                         case "1": {
+                            // Obtiene y muestra todas las parcelas (GET /parcelas)
                             String resp = restClient.get().uri("/parcelas")
                                 .retrieve().body(String.class);
                             out.println(resp);
@@ -76,14 +87,16 @@ public class ClienteApplication {
                         }
 
                         case "2": {
+                            // Pide el ID y consulta una parcela específica (GET /parcelas?id=X)
                             int id = Integer.parseInt(reader.readLine("Id parcela: ").trim());
-                            String resp = restClient.get().uri("/parcelas/" + id)
+                            String resp = restClient.get().uri("/parcelas?id=" + id)
                                 .retrieve().body(String.class);
                             out.println(resp);
                             break;
                         }
 
                         case "3": {
+                            // Lee datos y crea una nueva parcela enviando un JSON (POST /parcelas)
                             String nombre = reader.readLine("Nombre: ").trim();
                             String ubicacion = reader.readLine("Ubicacion: ").trim();
                             String body = "{\"nombre\":\"" + nombre + "\",\"ubicacion\":\"" + ubicacion + "\"}";
@@ -99,7 +112,7 @@ public class ClienteApplication {
                             String nombre = reader.readLine("Nuevo nombre: ").trim();
                             String ubicacion = reader.readLine("Nueva ubicacion: ").trim();
                             String body = "{\"nombre\":\"" + nombre + "\",\"ubicacion\":\"" + ubicacion + "\"}";
-                            restClient.put().uri("/parcelas/" + id)
+                            restClient.put().uri("/parcelas?id=" + id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .body(body).retrieve().toBodilessEntity();
                             out.println("Parcela actualizada");
@@ -108,7 +121,7 @@ public class ClienteApplication {
 
                         case "5": {
                             int id = Integer.parseInt(reader.readLine("Id parcela: ").trim());
-                            String resp = restClient.delete().uri("/parcelas/" + id)
+                            String resp = restClient.delete().uri("/parcelas?id=" + id)
                                 .retrieve().body(String.class);
                             out.println(resp);
                             break;
@@ -123,7 +136,7 @@ public class ClienteApplication {
 
                         case "7": {
                             int id = Integer.parseInt(reader.readLine("Id dispositivo: ").trim());
-                            String resp = restClient.get().uri("/dispositivos/" + id)
+                            String resp = restClient.get().uri("/dispositivos?id=" + id)
                                 .retrieve().body(String.class);
                             out.println(resp);
                             break;
@@ -151,7 +164,7 @@ public class ClienteApplication {
                             String desc = reader.readLine("Descripcion: ").trim();
                             String body = "{\"parcelaId\":" + parcelaId + ",\"urn\":\"" + urn +
                                 "\",\"tipo\":\"" + tipo + "\",\"descripcion\":\"" + desc + "\"}";
-                            restClient.put().uri("/dispositivos/" + id)
+                            restClient.put().uri("/dispositivos?id=" + id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .body(body).retrieve().toBodilessEntity();
                             out.println("Dispositivo actualizado");
@@ -160,13 +173,14 @@ public class ClienteApplication {
 
                         case "10": {
                             int id = Integer.parseInt(reader.readLine("Id dispositivo: ").trim());
-                            String resp = restClient.delete().uri("/dispositivos/" + id)
+                            String resp = restClient.delete().uri("/dispositivos?id=" + id)
                                 .retrieve().body(String.class);
                             out.println(resp);
                             break;
                         }
 
                         case "11": {
+                            // Genera y envía un array JSON en formato SenML para una parcela (POST)
                             int parcelaId = Integer.parseInt(reader.readLine("Id parcela: ").trim());
                             String bn = reader.readLine("URN dispositivo (ej: urn:dev:greenhouse-01/): ").trim();
                             int n = Integer.parseInt(reader.readLine("Numero de mediciones: ").trim());
@@ -251,8 +265,10 @@ public class ClienteApplication {
                     }
 
                 } catch (HttpClientErrorException e) {
+                    // Captura errores HTTP devueltos por el servidor (ej. 404, 400, 500)
                     out.println("Error " + e.getStatusCode().value() + ": " + e.getResponseBodyAsString());
                 } catch (NumberFormatException e) {
+                    // Captura errores si el usuario introduce letras en vez de números
                     out.println("Valor numerico invalido");
                 }
 

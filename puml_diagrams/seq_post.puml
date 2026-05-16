@@ -1,0 +1,28 @@
+@startuml
+actor "Mota / Cliente" as M
+participant "MedicionController" as MC
+participant "SenMLParser" as SP
+participant "MedicionDAO" as MD
+database "BD" as DB
+
+M -> MC : POST /parcelas/1/mediciones/senml\nContent-Type: application/senml+json\nBody: [ { "bn": "urn:dev:01", "n": "temp", "v": 23.5 } ]
+activate MC
+MC -> SP : parse(payload)
+activate SP
+SP --> MC : List<SenMLRecord>
+deactivate SP
+
+loop Por cada SenMLRecord
+    MC -> MD : insert(medicion)
+    activate MD
+    MD -> DB : INSERT INTO mediciones
+    activate DB
+    DB --> MD : OK
+    deactivate DB
+    MD --> MC : true
+    deactivate MD
+end
+
+MC --> M : 201 CREATED
+deactivate MC
+@enduml

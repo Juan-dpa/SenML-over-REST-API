@@ -1,0 +1,27 @@
+@startuml
+actor ClienteREST as C
+participant "DispositivoController" as DC
+participant "DispositivoDAO" as DAO
+database "BD" as DB
+
+C -> DC : DELETE /dispositivos?id=5
+activate DC
+DC -> DAO : delete(5)
+activate DAO
+DAO -> DB : DELETE FROM dispositivo WHERE id=5
+activate DB
+
+alt Si el registro existía
+    DB --> DAO : Filas afectadas (1)
+    DAO --> DC : true
+    DC --> C : 200 OK (Mensaje: "Dispositivo eliminado")
+else Si no existe
+    DB --> DAO : Filas afectadas (0)
+    DAO --> DC : false
+    DC --> C : 404 NOT FOUND (Mensaje: "No encontrado")
+end
+
+deactivate DB
+deactivate DAO
+deactivate DC
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+actor ClienteREST as C
+participant "ParcelaController" as PC
+participant "ParcelaDAO" as DAO
+database "BD" as DB
+
+C -> PC : PUT /parcelas?id=2\nBody: { "nombre": "Parcela B" }
+activate PC
+PC -> DAO : update(2, parcela)
+activate DAO
+DAO -> DB : Ejecuta UPDATE parcela WHERE id=2
+activate DB
+DB --> DAO : Filas afectadas (1)
+deactivate DB
+DAO --> PC : true
+deactivate DAO
+PC --> C : 200 OK
+deactivate PC
+@enduml

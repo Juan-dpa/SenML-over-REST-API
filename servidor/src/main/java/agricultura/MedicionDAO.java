@@ -4,6 +4,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) para interactuar con la tabla de Mediciones.
+ * Esta tabla guarda los datos recogidos por los dispositivos, incluyendo variables booleanas, de texto y numéricas.
+ */
 public class MedicionDAO {
 
     private static final String URL  = "jdbc:postgresql://localhost:5432/juadelavi";
@@ -13,10 +17,21 @@ public class MedicionDAO {
     public MedicionDAO() {
     }
 
+    /**
+     * Establece y devuelve una conexión con la base de datos PostgreSQL.
+     * @return Conexión a la base de datos local.
+     * @throws SQLException Si ocurre algún problema conectando.
+     */
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);
     }
 
+    /**
+     * Inserta una nueva medición aislada en la base de datos.
+     * Detecta el tipo de dato que contiene (numérico, booleano o texto) y establece los valores adecuados o NULL.
+     * @param m Objeto Medicion mapeado, usualmente a partir de SenML.
+     * @return true si la inserción fue correcta.
+     */
     public boolean insertarMedicion(Medicion m) {
         String sql = "INSERT INTO mediciones " +
             "(parcela_id, dispositivo_urn, magnitud, unidad, valor_numerico, " +
@@ -64,6 +79,12 @@ public class MedicionDAO {
         }
     }
 
+    /**
+     * Obtiene el historial completo de mediciones pertenecientes a una misma parcela.
+     * Los resultados vienen ordenados por dispositivo y tiempo.
+     * @param parcelaId ID de la parcela objetivo.
+     * @return Lista de objetos Medicion devueltos.
+     */
     public List<Medicion> getMedicionesByParcela(int parcelaId) {
         String sql = "SELECT * FROM mediciones WHERE parcela_id = ? ORDER BY dispositivo_urn, timestamp_epoch NULLS LAST";
         List<Medicion> resultado = new ArrayList<>();
@@ -99,6 +120,11 @@ public class MedicionDAO {
         return resultado;
     }
 
+    /**
+     * Recupera el histórico de datos reportados específicamente por un dispositivo determinado.
+     * @param urn Identificador URN del dispositivo (mota).
+     * @return Lista cronológica de sus mediciones.
+     */
     public List<Medicion> getMedicionesByDispositivo(String urn) {
         String sql = "SELECT * FROM mediciones WHERE dispositivo_urn = ? ORDER BY dispositivo_urn, timestamp_epoch NULLS LAST";
         List<Medicion> resultado = new ArrayList<>();
@@ -134,6 +160,11 @@ public class MedicionDAO {
         return resultado;
     }
 
+    /**
+     * Obtiene una sola medición mediante su ID primario.
+     * @param id Clave primaria de la medición.
+     * @return El objeto Medicion, o null si no se halla en BD.
+     */
     public Medicion getMedicionById(int id) {
         String sql = "SELECT * FROM mediciones WHERE id = ?";
         Medicion m = null;
@@ -168,6 +199,14 @@ public class MedicionDAO {
         return m;
     }
 
+    /**
+     * Modifica el registro de una medición.
+     * Actualiza magnitud, unidad y su respectivo valor (número, texto o booleano),
+     * anulando los otros campos para mantener consistencia.
+     * @param id ID de la medición a modificar.
+     * @param m Nuevos datos para aplicar.
+     * @return true si se aplicó el cambio exitosamente.
+     */
     public boolean updateMedicion(int id, Medicion m) {
         String sql = "UPDATE mediciones SET dispositivo_urn = ?, magnitud = ?, unidad = ?, " +
             "valor_numerico = ?, valor_booleano = ?, valor_texto = ?, timestamp_epoch = ? " +
@@ -215,6 +254,11 @@ public class MedicionDAO {
         }
     }
 
+    /**
+     * Borra una medición del registro histórico.
+     * @param id ID de la medición a eliminar.
+     * @return true si la fila existía y fue borrada.
+     */
     public boolean deleteMedicion(int id) {
         String sql = "DELETE FROM mediciones WHERE id = ?";
 

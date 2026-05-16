@@ -4,6 +4,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) encargado de gestionar los Dispositivos (motas) en PostgreSQL.
+ * Provee la lógica para acceder y modificar las tablas correspondientes en la base de datos.
+ */
 public class DispositivoDAO {
 
     private static final String URL  = "jdbc:postgresql://localhost:5432/juadelavi";
@@ -13,10 +17,19 @@ public class DispositivoDAO {
     public DispositivoDAO() {
     }
 
+    /**
+     * Establece y devuelve una conexión con la base de datos.
+     * @return Conexión activa a PostgreSQL.
+     * @throws SQLException Si hay un error de conexión.
+     */
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);
     }
 
+    /**
+     * Recupera todos los dispositivos registrados en el sistema.
+     * @return Lista de objetos Dispositivo.
+     */
     public List<Dispositivo> getAll() {
         String sql = "SELECT * FROM dispositivos";
         List<Dispositivo> resultado = new ArrayList<>();
@@ -47,6 +60,11 @@ public class DispositivoDAO {
         return resultado;
     }
 
+    /**
+     * Busca y devuelve un dispositivo específico según su ID numérico.
+     * @param id Identificador único del dispositivo en la base de datos.
+     * @return Objeto Dispositivo encontrado, o null si no existe.
+     */
     public Dispositivo getById(int id) {
         String sql = "SELECT * FROM dispositivos WHERE id = ?";
         Dispositivo dispositivo = null;
@@ -77,6 +95,11 @@ public class DispositivoDAO {
         return dispositivo;
     }
 
+    /**
+     * Inserta un nuevo dispositivo en la base de datos, asociándolo a una parcela concreta.
+     * @param d Objeto Dispositivo con la información a insertar.
+     * @return true si se insertó correctamente, false en caso contrario.
+     */
     public boolean insert(Dispositivo d) {
         String sql = "INSERT INTO dispositivos (parcela_id, urn, tipo, descripcion) VALUES (?, ?, ?, ?)";
 
@@ -100,6 +123,12 @@ public class DispositivoDAO {
         }
     }
 
+    /**
+     * Sobrescribe los datos de un dispositivo existente.
+     * @param id ID del dispositivo que se va a modificar.
+     * @param d Objeto con la información actualizada.
+     * @return true si la actualización tuvo éxito y afectó a alguna fila.
+     */
     public boolean update(int id, Dispositivo d) {
         String sql = "UPDATE dispositivos SET parcela_id = ?, urn = ?, tipo = ?, descripcion = ? WHERE id = ?";
 
@@ -124,6 +153,11 @@ public class DispositivoDAO {
         }
     }
 
+    /**
+     * Borra un dispositivo de la base de datos dado su identificador.
+     * @param id Identificador del dispositivo a eliminar.
+     * @return true si la eliminación se realizó con éxito.
+     */
     public boolean delete(int id) {
         String sql = "DELETE FROM dispositivos WHERE id = ?";
 
